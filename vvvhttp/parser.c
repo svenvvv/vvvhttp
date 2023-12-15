@@ -124,27 +124,20 @@ char const * parse_parameters(struct vvvhttp_request * request,
             goto error;
         }
 
-        param_mid = find_char_on_line(param, '=', buf_end - param);
-        if (param_mid == NULL) {
-            param_end = find_param_end(param, buf_end - param);
-            if (param_end == NULL) {
-                LOG_ERR("param: malformed, no end on param %d\n", param_num);
-                goto error;
-            }
+        param_end = find_param_end(param, buf_end - param);
+        if (param_end == NULL) {
+            LOG_ERR("param: malformed, no end for param %d\n", param_num);
+            goto error;
+        }
 
+        param_mid = find_char_on_line(param, '=', param_end - param);
+        if (param_mid == NULL) {
             p->first.ptr = param;
             p->first.len = param_end - param;
             p->second.len = 0;
 
             LOG_DBG("param: \"%.*s\" = no value\n", p->first.len, p->first.ptr);
         } else {
-            LOG_INF("find param end %p, %p\n", param_mid, buf_end);
-            param_end = find_param_end(param_mid + 1, buf_end - param_mid - 1);
-            if (param_end == NULL) {
-                LOG_ERR("param: malformed, no end on param %d\n", param_num);
-                goto error;
-            }
-
             p->first.ptr = param;
             p->first.len = param_mid - param;
             p->second.ptr = param_mid + 1;
@@ -152,13 +145,6 @@ char const * parse_parameters(struct vvvhttp_request * request,
 
             LOG_DBG("param: \"%.*s\" = \"%.*s\"\n",
                     p->first.len, p->first.ptr, p->second.len, p->second.ptr);
-
-        }
-
-        if (p->first.len == 0) {
-            LOG_WRN("param: malformed, empty key on param %d\n", param_num);
-        } else {
-            request->params_count += 1;
         }
 
         if (*param_end == ' ') {
