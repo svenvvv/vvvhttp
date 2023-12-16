@@ -369,6 +369,9 @@ int vvvhttp_serialize_response(struct vvvhttp_response const * res, char * data,
     }
     head += err;
 
+    if (data_end - head < 2) {
+        goto error;
+    }
     head[0] = '\r';
     head[1] = '\n';
     head += 2;
@@ -418,6 +421,9 @@ int vvvhttp_serialize_response(struct vvvhttp_response const * res, char * data,
         head += err;
     }
 
+    if (data_end - head < 2) {
+        goto error;
+    }
     head[0] = '\r';
     head[1] = '\n';
     head += 2;
