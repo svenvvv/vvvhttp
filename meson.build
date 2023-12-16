@@ -11,14 +11,15 @@ project(
 	]
 )
 
-vvvhttp_inc = include_directories('include/vvvhttp')
+lib_vvvhttp_inc = include_directories('include/vvvhttp')
+vvvhttp_inc = include_directories('include')
 
 subdir('vvvhttp')
 
 executable(
     'vvvhttp_example',
     files('main.c', 'handler_example.c'),
-    include_directories: include_directories('include'),
+    include_directories: vvvhttp_inc,
     link_with: [lib_vvvhttp],
 )
 
@@ -29,9 +30,13 @@ if get_option('fuzzing').enabled()
         executable(
             'vvvhttp_libfuzzer',
             [ files('main_libfuzzer.c', 'handler_example.c'), lib_vvvhttp_src ],
-            include_directories: [ include_directories('include'), vvvhttp_inc ],
+            include_directories: [ vvvhttp_inc, lib_vvvhttp_inc ],
             link_args: fuzz_opts,
             c_args: fuzz_opts
         )
     endif
+endif
+
+if get_option('testing').enabled()
+    subdir('tests')
 endif

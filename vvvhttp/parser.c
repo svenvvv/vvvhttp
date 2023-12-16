@@ -117,6 +117,8 @@ char const * parse_parameters(struct vvvhttp_request * request,
     char const * param_end = NULL;
     char const * param_mid = NULL;
 
+    request->params_count = 0;
+
     for (int param_num = 1;; ++param_num) {
         struct vstring_pair * p = &request->params[request->params_count];
 
@@ -135,6 +137,7 @@ char const * parse_parameters(struct vvvhttp_request * request,
         if (param_mid == NULL) {
             p->first.ptr = param;
             p->first.len = param_end - param;
+            p->second.ptr = NULL;
             p->second.len = 0;
 
             LOG_DBG("param: \"%.*s\" = no value\n", p->first.len, p->first.ptr);
@@ -148,7 +151,14 @@ char const * parse_parameters(struct vvvhttp_request * request,
                     p->first.len, p->first.ptr, p->second.len, p->second.ptr);
         }
 
+        request->params_count += 1;
+
         if (*param_end == ' ') {
+            param = param_end;
+            break;
+        }
+        if (request->params_count == ARRAY_SIZE(request->params)) {
+            LOG_ERR("param: too many params, buffer full, %d", request->params_count);
             param = param_end;
             break;
         }
@@ -168,6 +178,8 @@ int vvvhttp_parse_request(struct vvvhttp_request * request, char const * data, s
 {
     int err;
     char const * const buf_end = data + data_len;
+
+    LOG_DBG("parser: parsing %zu bytes\n", data_len);
 
     char const * substr = data;
     char const * substr_end = find_char_on_line(substr, ' ', buf_end - substr);

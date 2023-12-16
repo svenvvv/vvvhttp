@@ -5,6 +5,7 @@
 
 #define VVVHTTP_ROUTE_MAX_SEGMENTS      64
 #define VVVHTTP_REQUEST_MAX_HEADERS     64
+#define VVVHTTP_REQUEST_MAX_PARAMS      64
 #define VVVHTTP_RESPONSE_MAX_HEADERS    64
 
 #ifndef ARRAY_SIZE
@@ -50,7 +51,7 @@ struct vvvhttp_request
     size_t headers_count;
     struct vstring_pair headers[VVVHTTP_REQUEST_MAX_HEADERS];
     size_t params_count;
-    struct vstring_pair params[VVVHTTP_REQUEST_MAX_HEADERS];
+    struct vstring_pair params[VVVHTTP_REQUEST_MAX_PARAMS];
     struct vstring body;
     struct vstring content_type;
     /** Unused by vvvhttp, free to be used in user code */

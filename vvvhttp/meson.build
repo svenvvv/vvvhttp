@@ -9,5 +9,5 @@ lib_vvvhttp_src = files(
 lib_vvvhttp = static_library(
     'vvvhttp',
     lib_vvvhttp_src,
-    include_directories: vvvhttp_inc
+    include_directories: lib_vvvhttp_inc
 )

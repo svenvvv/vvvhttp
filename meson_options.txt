@@ -4,3 +4,10 @@ option(
     value : 'disabled',
     description : 'Compile fuzzer builds'
 )
+
+option(
+    'testing',
+    type : 'feature',
+    value : 'disabled',
+    description : 'Compile tests'
+)
