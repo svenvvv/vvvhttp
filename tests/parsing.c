@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,6 +14,13 @@
     "Host: localhost:8080\r\n" \
     "User-Agent: test/1.0.0\r\n" \
     "Accept: */*\r\n" \
+    "\r\n" \
+)
+
+#define DEF_REQ_H(method, uri, httpver, headers) \
+( \
+    method " " uri " HTTP/" httpver "\r\n" \
+    headers \
     "\r\n" \
 )
 
@@ -178,6 +184,20 @@ TEST(test_path_multiple, DEF_REQ("GET", "/first/second/third", "1.1"), {
     EXPECT_EQ_VSTR("third", request.path_segments[2]);
 });
 
+// Headers
+TEST(test_headers_single, DEF_REQ_H("GET", "/", "1.1", "First-Header: 20\r\n"), {
+    EXPECT_EQ(1, request.headers_count);
+    EXPECT_EQ_VSTR("First-Header", request.headers[0].first);
+    EXPECT_EQ_VSTR("20", request.headers[0].second);
+});
+TEST(test_headers_multiple, DEF_REQ_H("GET", "/", "1.1", "First-Header: 20\r\nSecond-Header: 30\r\n"), {
+    EXPECT_EQ(2, request.headers_count);
+    EXPECT_EQ_VSTR("First-Header", request.headers[0].first);
+    EXPECT_EQ_VSTR("20", request.headers[0].second);
+    EXPECT_EQ_VSTR("Second-Header", request.headers[1].first);
+    EXPECT_EQ_VSTR("30", request.headers[1].second);
+});
+
 typedef int (*test_fn)(void);
 
 int main(int argc, char ** argv)
@@ -209,6 +229,9 @@ int main(int argc, char ** argv)
         test_path_empty,
         test_path_simple,
         test_path_multiple,
+
+        test_headers_single,
+        test_headers_multiple,
     };
 
     for (size_t i = 0; i < ARRAY_SIZE(tests); ++i) {
