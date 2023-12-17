@@ -174,6 +174,45 @@ bool is_number(char ch)
     return '0' <= ch && ch <= '9';
 }
 
+static int parse_path_segments(struct vvvhttp_request * req)
+{
+    if (req->path.len < 1) {
+        LOG_ERR("parser: empty path\n");
+        goto error;
+    }
+
+    char const * head = req->path.ptr + 1;
+    char const * prev_head = head;
+    char const * head_end = req->path.ptr + req->path.len;
+
+    req->path_segments_count = 0;
+
+    do {
+        if (req->path_segments_count == ARRAY_SIZE(req->path_segments)) {
+            LOG_ERR("parser: too many path segments\n");
+            goto error;
+        }
+
+        struct vstring * seg = &req->path_segments[req->path_segments_count];
+        head = memchr(head, '/', head_end - head);
+        if (head == NULL) {
+            head = head_end;
+        }
+
+        seg->ptr = prev_head;
+        seg->len = head - prev_head;
+        LOG_DBG("segment: %.*s (%d)\n", seg->len, seg->ptr, seg->len);
+
+        head += 1;
+        req->path_segments_count += 1;
+        prev_head = head;
+    } while (head < head_end);
+
+    return req->path_segments_count;
+error:
+    return -1;
+}
+
 int vvvhttp_parse_request(struct vvvhttp_request * request, char const * data, size_t data_len)
 {
     int err;
@@ -209,6 +248,12 @@ int vvvhttp_parse_request(struct vvvhttp_request * request, char const * data, s
     }
     request->path.ptr = substr;
     request->path.len = substr_len;
+
+    err = parse_path_segments(request);
+    if (err < 0) {
+        LOG_ERR("parser: failed to parse path segments, %d\n", err);
+        goto invalid;
+    }
 
     substr = substr_end + 1;
     substr_end = find_newline(substr, buf_end - substr);

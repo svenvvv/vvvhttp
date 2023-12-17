@@ -47,13 +47,20 @@ struct vvvhttp_request
 {
     enum vvvhttp_method method;
     unsigned http_version;
+
     struct vstring path;
+    size_t path_segments_count;
+    struct vstring path_segments[VVVHTTP_ROUTE_MAX_SEGMENTS];
+
     size_t headers_count;
     struct vstring_pair headers[VVVHTTP_REQUEST_MAX_HEADERS];
+
     size_t params_count;
     struct vstring_pair params[VVVHTTP_REQUEST_MAX_PARAMS];
+
     struct vstring body;
     struct vstring content_type;
+
     /** Unused by vvvhttp, free to be used in user code */
     void * userdata;
 };

@@ -159,6 +159,25 @@ TEST(test_method_trace, DEF_REQ("TRACE", "/", "1.1"), {
     EXPECT_EQ(HTTP_METHOD_TRACE, request.method);
 });
 
+// Path tests
+TEST(test_path_empty, DEF_REQ("GET", "/", "1.1"), {
+    EXPECT_EQ_VSTR("/", request.path);
+    EXPECT_EQ(1, request.path_segments_count);
+    EXPECT_EQ_VSTR("", request.path_segments[0]);
+});
+TEST(test_path_simple, DEF_REQ("GET", "/single-path", "1.1"), {
+    EXPECT_EQ_VSTR("/single-path", request.path);
+    EXPECT_EQ(1, request.path_segments_count);
+    EXPECT_EQ_VSTR("single-path", request.path_segments[0]);
+});
+TEST(test_path_multiple, DEF_REQ("GET", "/first/second/third", "1.1"), {
+    EXPECT_EQ_VSTR("/first/second/third", request.path);
+    EXPECT_EQ(3, request.path_segments_count);
+    EXPECT_EQ_VSTR("first", request.path_segments[0]);
+    EXPECT_EQ_VSTR("second", request.path_segments[1]);
+    EXPECT_EQ_VSTR("third", request.path_segments[2]);
+});
+
 typedef int (*test_fn)(void);
 
 int main(int argc, char ** argv)
@@ -186,6 +205,10 @@ int main(int argc, char ** argv)
         test_method_post,
         test_method_put,
         test_method_trace,
+
+        test_path_empty,
+        test_path_simple,
+        test_path_multiple,
     };
 
     for (size_t i = 0; i < ARRAY_SIZE(tests); ++i) {
