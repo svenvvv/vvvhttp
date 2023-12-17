@@ -8,9 +8,7 @@
 #define VVVHTTP_REQUEST_MAX_PARAMS      64
 #define VVVHTTP_RESPONSE_MAX_HEADERS    64
 
-#ifndef ARRAY_SIZE
-#   define ARRAY_SIZE(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-#endif
+#define VVVHTTP_ARRAY_SIZE(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
 struct vvvhttp_response;
 struct vvvhttp_request;
@@ -143,9 +141,9 @@ struct vvvhttp_route
     static vvvhttp_processor_callback const __vvvhttp_route_postprocessors_##_id[] = \
         _postprocessors; \
     _VVVHTTP_DEFINE_ROUTE_1(_id, __vvvhttp_route_preprocessors_##_id, \
-                          ARRAY_SIZE(__vvvhttp_route_preprocessors_##_id), \
+                          VVVHTTP_ARRAY_SIZE(__vvvhttp_route_preprocessors_##_id), \
                           __vvvhttp_route_postprocessors_##_id, \
-                          ARRAY_SIZE(__vvvhttp_route_postprocessors_##_id), \
+                          VVVHTTP_ARRAY_SIZE(__vvvhttp_route_postprocessors_##_id), \
                           _route, _supported_methods, _request_handler, \
                           _cleanup_callback, _userdata)
 

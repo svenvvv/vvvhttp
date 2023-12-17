@@ -168,4 +168,4 @@ test_fn const tests[] = {
 
     test_body,
 };
-size_t tests_count = ARRAY_SIZE(tests);
+size_t tests_count = VVVHTTP_ARRAY_SIZE(tests);

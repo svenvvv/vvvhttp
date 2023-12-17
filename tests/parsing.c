@@ -60,7 +60,7 @@ char const * uri_generator_indexed_query_params(int count)
     static char uri[4 * 1024];
     static char buf[4 * 1024 + 128];
     char * head = uri;
-    char * head_end = uri + ARRAY_SIZE(uri);
+    char * head_end = uri + VVVHTTP_ARRAY_SIZE(uri);
     size_t ret;
 
     ret = snprintf(head, head_end - head, "/?key0=value0");
@@ -221,4 +221,4 @@ test_fn const tests[] = {
 
     test_body,
 };
-size_t tests_count = ARRAY_SIZE(tests);
+size_t tests_count = VVVHTTP_ARRAY_SIZE(tests);

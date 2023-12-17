@@ -157,7 +157,7 @@ char const * parse_parameters(struct vvvhttp_request * request,
             param = param_end;
             break;
         }
-        if (request->params_count == ARRAY_SIZE(request->params)) {
+        if (request->params_count == VVVHTTP_ARRAY_SIZE(request->params)) {
             LOG_ERR("param: too many params, buffer full, %d", request->params_count);
             param = param_end;
             break;
@@ -188,7 +188,7 @@ static int parse_path_segments(struct vvvhttp_request * req)
     req->path_segments_count = 0;
 
     do {
-        if (req->path_segments_count == ARRAY_SIZE(req->path_segments)) {
+        if (req->path_segments_count == VVVHTTP_ARRAY_SIZE(req->path_segments)) {
             LOG_ERR("parser: too many path segments\n");
             goto error;
         }
@@ -286,7 +286,7 @@ int vvvhttp_parse_request(struct vvvhttp_request * request, char const * data, s
         if (substr_end != NULL) {
             substr_len = substr_end - substr;
 
-            if (request->headers_count == ARRAY_SIZE(request->headers)) {
+            if (request->headers_count == VVVHTTP_ARRAY_SIZE(request->headers)) {
                 LOG_ERR("Too many headers, unable to parse\n");
                 goto invalid;
             }

@@ -7,7 +7,7 @@ int vvvhttp_response_set_header_string(struct vvvhttp_response * res,
                                        char const * value, size_t value_len)
 {
     struct vstring_pair * h;
-    if (res->headers_count == ARRAY_SIZE(res->headers)) {
+    if (res->headers_count == VVVHTTP_ARRAY_SIZE(res->headers)) {
         return -ENOSPC;
     }
 
