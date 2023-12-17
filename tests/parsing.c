@@ -1,21 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-
-#include <vvvhttp/vvvhttp.h>
-#include <vvvhttp/vvvlog.h>
-
-#define ARG_UNUSED(x) ((void)x)
+#include "common.h"
 
 #define DEF_REQ(method, uri, httpver) \
-( \
     method " " uri " HTTP/" httpver "\r\n" \
     "Host: localhost:8080\r\n" \
     "User-Agent: test/1.0.0\r\n" \
     "Accept: */*\r\n" \
-    "\r\n" \
-)
+    "\r\n"
 
 #define DEF_REQ_H(method, uri, httpver, headers) \
 ( \
@@ -198,88 +188,37 @@ TEST(test_headers_multiple, DEF_REQ_H("GET", "/", "1.1", "First-Header: 20\r\nSe
     EXPECT_EQ_VSTR("30", request.headers[1].second);
 });
 
-typedef int (*test_fn)(void);
+// Body
+TEST(test_body, DEF_REQ("GET", "/", "1.1") "body data", {
+    EXPECT_EQ_VSTR("body data", request.body);
+});
 
-int main(int argc, char ** argv)
-{
-    ARG_UNUSED(argc);
-    ARG_UNUSED(argv);
+test_fn const tests[] = {
+    test_query_params_none,
+    test_query_params_val,
+    test_query_params_val_with_url,
+    test_query_params_val_noval_val,
+    test_query_params_max,
 
-    int err;
+    test_http_version_1_1,
+    test_http_version_2_0,
 
-    test_fn tests[] = {
-        test_query_params_none,
-        test_query_params_val,
-        test_query_params_val_with_url,
-        test_query_params_val_noval_val,
-        test_query_params_max,
+    test_method_connect,
+    test_method_delete,
+    test_method_get,
+    test_method_head,
+    test_method_options,
+    test_method_post,
+    test_method_put,
+    test_method_trace,
 
-        test_http_version_1_1,
-        test_http_version_2_0,
+    test_path_empty,
+    test_path_simple,
+    test_path_multiple,
 
-        test_method_connect,
-        test_method_delete,
-        test_method_get,
-        test_method_head,
-        test_method_options,
-        test_method_post,
-        test_method_put,
-        test_method_trace,
+    test_headers_single,
+    test_headers_multiple,
 
-        test_path_empty,
-        test_path_simple,
-        test_path_multiple,
-
-        test_headers_single,
-        test_headers_multiple,
-    };
-
-    for (size_t i = 0; i < ARRAY_SIZE(tests); ++i) {
-        err = tests[i]();
-        if (err != 0) {
-            fprintf(stderr, "Test %zu failed with code %d\n", i + 1, err);
-            return -1;
-        }
-    }
-
-    return 0;
-}
-
-int vvvlog_handler(enum vvvlog_level level, char const * fmt, ...)
-{
-    int err;
-    va_list va;
-    char const * level_str;
-
-    switch (level) {
-        case VVVLOG_LEVEL_DBG:
-            level_str = "dbg";
-            break;
-        case VVVLOG_LEVEL_INF:
-            level_str = "inf";
-            break;
-        case VVVLOG_LEVEL_WRN:
-            level_str = "wrn";
-            break;
-        case VVVLOG_LEVEL_ERR:
-            level_str = "err";
-            break;
-        default:
-            level_str = "unk";
-            break;
-    }
-
-    fprintf(stdout, "[vvvhttp:%s]:", level_str);
-
-    va_start(va, fmt);
-    err = vfprintf(stdout, fmt, va);
-    va_end(va);
-
-    return err;
-}
-
-VVVHTTP_DEFINE_ROUTE(none,
-    VVVHTTP_PROCESSOR_LIST({}),
-    VVVHTTP_PROCESSOR_LIST({}),
-    "/", HTTP_METHOD_GET,
-    NULL, NULL, NULL);
+    test_body,
+};
+size_t tests_count = ARRAY_SIZE(tests);
